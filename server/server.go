@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -124,7 +125,9 @@ func (s *Server) Run(version string) error {
 		}
 	}
 	if c.IncomingPort <= 0 || c.IncomingPort >= 65535 {
-		c.IncomingPort = 50007
+	        ln, _ := net.Listen("tcp",":0")
+		c.IncomingPort = ln.Addr().(*net.TCPAddr).Port
+		ln.Close()
 	}
 	if err := s.reconfigure(c); err != nil {
 		return fmt.Errorf("initial configure failed: %s", err)
